@@ -4,7 +4,6 @@
 //
 
 import Foundation
-import RegexHelper
 
 func main() {
     let fileUrl = URL(fileURLWithPath: "./aoc-input")
@@ -13,27 +12,38 @@ func main() {
     let lines = inputString.components(separatedBy: "\n")
         .filter { !$0.isEmpty }
     
-    // Sample algorithm
-    var scoreboard = [String: Int]()
+    var duplicatedItems = 0
+    
     lines.forEach { line in
-        let (name, score) = parseLine(line)
-        scoreboard[name] = score
+        let rucksack = parseLine(line)
+        let c1 = Set(rucksack.c1)
+        let c2 = Set(rucksack.c2)
+        let result = c1.intersection(c2)
+        duplicatedItems += result.map { alphaDictionary[String($0)]! }.reduce(0, +)
     }
-    scoreboard
-        .sorted { lhs, rhs in
-            lhs.value > rhs.value
-        }
-        .forEach { name, score in
-            print("\(name) \(score) pts")
-        }
+    
+    print(duplicatedItems)
 }
 
-func parseLine(_ line: String) -> (name: String, score: Int) {
-    let helper = RegexHelper(pattern: #"([\-\w]*)\s(\d+)"#)
-    let result = helper.parse(line)
-    let name = result[0]
-    let score = Int(result[1])!
-    return (name: name, score: score)
+var alphaDictionary: [String: Int] {
+    let alphabet: [String] = [
+        "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z",
+        "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"
+    ]
+    var result = [String: Int]()
+    var i = 1
+    for letter in alphabet {
+        result[letter] = i
+        i += 1
+    }
+    return result
+}
+
+func parseLine(_ line: String) -> (c1: [Character], c2: [Character]) {
+    let rucksack = Array(line)
+    let compartment1 = Array(rucksack.dropLast(rucksack.count/2))
+    let compartment2 = Array(rucksack.dropFirst(rucksack.count/2))
+    return (compartment1, compartment2)
 }
 
 main()
