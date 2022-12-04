@@ -4,6 +4,7 @@
 //
 
 import Foundation
+import Algorithms
 
 func main() {
     let fileUrl = URL(fileURLWithPath: "./aoc-input")
@@ -12,6 +13,11 @@ func main() {
     let lines = inputString.components(separatedBy: "\n")
         .filter { !$0.isEmpty }
     
+    solve1(lines: lines)
+    solve2(lines: lines)
+}
+
+func solve1(lines: [String]) {
     var duplicatedItems = 0
     
     lines.forEach { line in
@@ -24,6 +30,18 @@ func main() {
     
     print(duplicatedItems)
 }
+
+func solve2(lines: [String]) {
+    let groups = lines.map(Set.init).chunks(ofCount: 3).map(Array.init)
+    var priority = 0
+    for group in groups {
+        priority += group[0].intersection(group[1]).intersection(group[2])
+            .map { alphaDictionary[String($0)]! }
+            .reduce(0, +)
+    }
+    print(priority)
+}
+
 
 var alphaDictionary: [String: Int] {
     let alphabet: [String] = [
